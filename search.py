@@ -4,9 +4,30 @@
 
 """
 
-#Finishing the page ranking algorithm.
+def lucky_search(index, ranks, keyword):
+    pages = lookup(index, keyword)
+    if not pages:
+        return None
+    best_page = pages[0]
+    for candidate in pages:
+        if ranks[candidate] > ranks[best_page]:
+            best_page = candidate
+    return best_page
+
 def compute_ranks(graph):
-    # TODO(zx): 待注释page raning算法
+    """page rank algorithm
+
+    rank(page, 0) = 1/npages
+    rank(page, t) = (1-d)/npages 
+                  + sum (d * rank(p, t - 1) / number of outlinks from p) 
+                  over all pages p that link to this page
+
+    args:
+       graph:  {page: [all urls in this page]}
+
+    return:
+       rank: {page: rank value}
+    """
     d = 0.8 # damping factor
     numloops = 10
     
@@ -19,8 +40,6 @@ def compute_ranks(graph):
         newranks = {}
         for page in graph:
             newrank = (1 - d) / npages
-            
-            #Insert Code Here
             for node in graph:
                 if page in graph[node]:
                     newrank += d * ranks[node] / len(graph[node])
@@ -160,7 +179,7 @@ def crawl_web(seed):
 
     返回值:
         index: {keyword: [url,url...]}
-        graph: {page: [all links in page]}
+        graph: {page: [all url in this page]}
 
     异常:
 
@@ -287,7 +306,8 @@ def lookup(index, keyword):
 if __name__ == "__main__":
     index, graph = crawl_web('http://udacity.com/cs101x/urank/index.html')
     ranks = compute_ranks(graph)
-    print(ranks)
+
+    #print(ranks)
 
     #>>> {'http://udacity.com/cs101x/urank/kathleen.html': 0.11661866666666663,
     #'http://udacity.com/cs101x/urank/zinc.html': 0.038666666666666655,
@@ -296,5 +316,12 @@ if __name__ == "__main__":
     #'http://udacity.com/cs101x/urank/index.html': 0.033333333333333326,
     #'http://udacity.com/cs101x/urank/nickel.html': 0.09743999999999997}
 
+    print(lucky_search(index, ranks, 'Hummus'))
+    #>>> http://udacity.com/cs101x/urank/kathleen.html
 
+    print(lucky_search(index, ranks, 'the'))
+    #>>> http://udacity.com/cs101x/urank/nickel.html
+
+    print(lucky_search(index, ranks, 'babaganoush'))
+    #>>> None
 
