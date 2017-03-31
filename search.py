@@ -4,7 +4,28 @@
 
 """
 
+def quick_sort_pages(ranks, pages):
+    if not pages or len(pages) <= 1:
+        return pages
+    else:
+        pivot = ranks[pages[0]]
+        worse = []
+        better = []
+        for page in pages[1:]:
+            if ranks[page] <= pivot:
+                worse.append(page)
+            else:
+                better.append(page)
+    return quick_sort_pages(ranks, better) + [pages[0]] + quick_sort_pages(ranks, worse)
+
+def ordered_search(index, ranks, keyword):
+    pages = lookup(index, keyword)
+    return quick_sort_pages(ranks, pages)
+
 def lucky_search(index, ranks, keyword):
+    """找到最佳匹配结果
+
+    """
     pages = lookup(index, keyword)
     if not pages:
         return None
@@ -316,12 +337,27 @@ if __name__ == "__main__":
     #'http://udacity.com/cs101x/urank/index.html': 0.033333333333333326,
     #'http://udacity.com/cs101x/urank/nickel.html': 0.09743999999999997}
 
-    print(lucky_search(index, ranks, 'Hummus'))
+    #print(lucky_search(index, ranks, 'Hummus'))
     #>>> http://udacity.com/cs101x/urank/kathleen.html
 
-    print(lucky_search(index, ranks, 'the'))
+    #print(lucky_search(index, ranks, 'the'))
     #>>> http://udacity.com/cs101x/urank/nickel.html
 
-    print(lucky_search(index, ranks, 'babaganoush'))
+    #print(lucky_search(index, ranks, 'babaganoush'))
     #>>> None
 
+    print(ordered_search(index, ranks, 'Hummus'))
+    #>>> ['http://udacity.com/cs101x/urank/kathleen.html',
+    #    'http://udacity.com/cs101x/urank/nickel.html',
+    #    'http://udacity.com/cs101x/urank/arsenic.html',
+    #    'http://udacity.com/cs101x/urank/hummus.html',
+    #    'http://udacity.com/cs101x/urank/index.html']
+    
+    print(ordered_search(index, ranks, 'the'))
+    #>>> ['http://udacity.com/cs101x/urank/nickel.html',
+    #    'http://udacity.com/cs101x/urank/arsenic.html',
+    #    'http://udacity.com/cs101x/urank/hummus.html',
+    #    'http://udacity.com/cs101x/urank/index.html']
+
+    print(ordered_search(index, ranks, 'babaganoush')) 
+    #>>> None
